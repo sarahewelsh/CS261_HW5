@@ -169,7 +169,97 @@ class AVL:
         """
         TODO: Write your implementation
         """
-        pass
+        if self.root == None:                       # add new node to empty tree
+            self.root = TreeNode(value)
+            return
+
+        height = 0
+        curr_node = self.root
+        has_been_added = False
+        while not has_been_added:                       # look through tree, branching left when
+            if value < curr_node.value:                 # value to be added is smaller than current node.
+                if curr_node.left is None:              # Continue until correct location is found, then
+                    curr_node.left = TreeNode(value)    # add value.
+                    curr_node.left.parent = curr_node
+                    curr_node.left.height = height
+                    has_been_added = True
+                else:
+                    curr_node = curr_node.left
+            elif value > curr_node.value:              # look through tree, branching right when value
+                if curr_node.right is None:             # to be added is greater than or equal to current
+                    curr_node.right = TreeNode(value)   # node.  Continue until correct location is found,
+                    curr_node.right.height = height     # then add node.
+                    curr_node.right.parent = curr_node
+                    has_been_added = True
+                else:
+                    curr_node = curr_node.right
+            else:
+                return
+        while curr_node.parent != None:
+            curr_node = curr_node.parent
+            height += 1
+        if curr_node.parent == None:
+            curr_node.height = height
+
+        if
+        if self.root.left.height - self.root.right.height > 2:
+            if self.root.left.left.height - self.root.left.right.height > 2:
+                old_root = self.root
+                curr_node = self.root.left
+                old_right_child = curr_node.right
+                self.root = curr_node
+                old_root.parent = self.root
+                old_root.left = old_right_child
+                self.root.right = old_root
+            else:
+                curr_node = self.root.left
+                temp = curr_node.right
+                temp_left = temp.left
+                self.root.left = temp
+                temp.parent = self.root
+                temp.left = curr_node
+                curr_node.parent = temp
+                curr_node.right = temp_left
+                temp_left.parent = curr_node
+
+                curr_node = self.root.left
+                old_right_child = curr_node.right
+                old_root = self.root
+                self.root = curr_node
+                old_root.left = old_right_child
+                old_root.parent = self.root
+                self.root.right = old_root
+
+        elif elf.root.right.height - self.root.left.height > 2:
+            if self.root.right.right.height - self.root.right.left.height > 2:
+                old_root = self.root
+                old_left_child = curr_node.left
+                self.root = curr_node
+                old_root.parent = self.root
+                old_root.right = old_left_child
+                self.root.left = old_root
+
+            else:
+                curr_node = self.root.right
+                temp = curr_node.left
+                temp_right = temp.right
+                self.root.right = temp
+                temp.parent = self.root
+                temp.right = curr_node
+                curr_node.parent = temp
+                curr_node.left = temp_right
+                temp_right.parent = curr_node
+
+                curr_node = self.root.right
+                old_left_child = curr_node.left
+                old_root = self.root
+                self.root = curr_node
+                old_root.right = old_left_child
+                old_root.parent = self.root
+                self.root.left = old_root
+
+
+
 
     def remove(self, value: object) -> bool:
         """
@@ -195,93 +285,93 @@ if __name__ == '__main__':
         avl = AVL(case)
         print(avl)
 
-    print("\nPDF - method add() example 2")
-    print("----------------------------")
-    test_cases = (
-        (10, 20, 30, 40, 50),   # RR, RR
-        (10, 20, 30, 50, 40),   # RR, RL
-        (30, 20, 10, 5, 1),     # LL, LL
-        (30, 20, 10, 1, 5),     # LL, LR
-        (5, 4, 6, 3, 7, 2, 8),  # LL, RR
-        (range(0, 30, 3)),
-        (range(0, 31, 3)),
-        (range(0, 34, 3)),
-        (range(10, -10, -2)),
-        ('A', 'B', 'C', 'D', 'E'),
-        (1, 1, 1, 1),
-    )
-    for case in test_cases:
-        avl = AVL(case)
-        print('INPUT  :', case)
-        print('RESULT :', avl)
-
-    print("\nPDF - method add() example 3")
-    print("----------------------------")
-    for _ in range(100):
-        case = list(set(random.randrange(1, 20000) for _ in range(900)))
-        avl = AVL()
-        for value in case:
-            avl.add(value)
-        if not avl.is_valid_avl():
-            raise Exception("PROBLEM WITH ADD OPERATION")
-    print('add() stress test finished')
-
-    print("\nPDF - method remove() example 1")
-    print("-------------------------------")
-    test_cases = (
-        ((1, 2, 3), 1),  # no AVL rotation
-        ((1, 2, 3), 2),  # no AVL rotation
-        ((1, 2, 3), 3),  # no AVL rotation
-        ((50, 40, 60, 30, 70, 20, 80, 45), 0),
-        ((50, 40, 60, 30, 70, 20, 80, 45), 45),  # no AVL rotation
-        ((50, 40, 60, 30, 70, 20, 80, 45), 40),  # no AVL rotation
-        ((50, 40, 60, 30, 70, 20, 80, 45), 30),  # no AVL rotation
-    )
-    for tree, del_value in test_cases:
-        avl = AVL(tree)
-        print('INPUT  :', avl, "DEL:", del_value)
-        avl.remove(del_value)
-        print('RESULT :', avl)
-
-    print("\nPDF - method remove() example 2")
-    print("-------------------------------")
-    test_cases = (
-        ((50, 40, 60, 30, 70, 20, 80, 45), 20),  # RR
-        ((50, 40, 60, 30, 70, 20, 80, 15), 40),  # LL
-        ((50, 40, 60, 30, 70, 20, 80, 35), 20),  # RL
-        ((50, 40, 60, 30, 70, 20, 80, 25), 40),  # LR
-    )
-    for tree, del_value in test_cases:
-        avl = AVL(tree)
-        print('INPUT  :', avl, "DEL:", del_value)
-        avl.remove(del_value)
-        print('RESULT :', avl)
-
-    print("\nPDF - method remove() example 3")
-    print("-------------------------------")
-    case = range(-9, 16, 2)
-    avl = AVL(case)
-    for del_value in case:
-        print('INPUT  :', avl, del_value)
-        avl.remove(del_value)
-        print('RESULT :', avl)
-
-    print("\nPDF - method remove() example 4")
-    print("-------------------------------")
-    case = range(0, 34, 3)
-    avl = AVL(case)
-    for _ in case[:-2]:
-        print('INPUT  :', avl, avl.root.value)
-        avl.remove(avl.root.value)
-        print('RESULT :', avl)
-
-    print("\nPDF - method remove() example 5")
-    print("-------------------------------")
-    for _ in range(100):
-        case = list(set(random.randrange(1, 20000) for _ in range(900)))
-        avl = AVL(case)
-        for value in case[::2]:
-            avl.remove(value)
-        if not avl.is_valid_avl():
-            raise Exception("PROBLEM WITH REMOVE OPERATION")
-    print('remove() stress test finished')
+    # print("\nPDF - method add() example 2")
+    # print("----------------------------")
+    # test_cases = (
+    #     (10, 20, 30, 40, 50),   # RR, RR
+    #     (10, 20, 30, 50, 40),   # RR, RL
+    #     (30, 20, 10, 5, 1),     # LL, LL
+    #     (30, 20, 10, 1, 5),     # LL, LR
+    #     (5, 4, 6, 3, 7, 2, 8),  # LL, RR
+    #     (range(0, 30, 3)),
+    #     (range(0, 31, 3)),
+    #     (range(0, 34, 3)),
+    #     (range(10, -10, -2)),
+    #     ('A', 'B', 'C', 'D', 'E'),
+    #     (1, 1, 1, 1),
+    # )
+    # for case in test_cases:
+    #     avl = AVL(case)
+    #     print('INPUT  :', case)
+    #     print('RESULT :', avl)
+    #
+    # print("\nPDF - method add() example 3")
+    # print("----------------------------")
+    # for _ in range(100):
+    #     case = list(set(random.randrange(1, 20000) for _ in range(900)))
+    #     avl = AVL()
+    #     for value in case:
+    #         avl.add(value)
+    #     if not avl.is_valid_avl():
+    #         raise Exception("PROBLEM WITH ADD OPERATION")
+    # print('add() stress test finished')
+    #
+    # print("\nPDF - method remove() example 1")
+    # print("-------------------------------")
+    # test_cases = (
+    #     ((1, 2, 3), 1),  # no AVL rotation
+    #     ((1, 2, 3), 2),  # no AVL rotation
+    #     ((1, 2, 3), 3),  # no AVL rotation
+    #     ((50, 40, 60, 30, 70, 20, 80, 45), 0),
+    #     ((50, 40, 60, 30, 70, 20, 80, 45), 45),  # no AVL rotation
+    #     ((50, 40, 60, 30, 70, 20, 80, 45), 40),  # no AVL rotation
+    #     ((50, 40, 60, 30, 70, 20, 80, 45), 30),  # no AVL rotation
+    # )
+    # for tree, del_value in test_cases:
+    #     avl = AVL(tree)
+    #     print('INPUT  :', avl, "DEL:", del_value)
+    #     avl.remove(del_value)
+    #     print('RESULT :', avl)
+    #
+    # print("\nPDF - method remove() example 2")
+    # print("-------------------------------")
+    # test_cases = (
+    #     ((50, 40, 60, 30, 70, 20, 80, 45), 20),  # RR
+    #     ((50, 40, 60, 30, 70, 20, 80, 15), 40),  # LL
+    #     ((50, 40, 60, 30, 70, 20, 80, 35), 20),  # RL
+    #     ((50, 40, 60, 30, 70, 20, 80, 25), 40),  # LR
+    # )
+    # for tree, del_value in test_cases:
+    #     avl = AVL(tree)
+    #     print('INPUT  :', avl, "DEL:", del_value)
+    #     avl.remove(del_value)
+    #     print('RESULT :', avl)
+    #
+    # print("\nPDF - method remove() example 3")
+    # print("-------------------------------")
+    # case = range(-9, 16, 2)
+    # avl = AVL(case)
+    # for del_value in case:
+    #     print('INPUT  :', avl, del_value)
+    #     avl.remove(del_value)
+    #     print('RESULT :', avl)
+    #
+    # print("\nPDF - method remove() example 4")
+    # print("-------------------------------")
+    # case = range(0, 34, 3)
+    # avl = AVL(case)
+    # for _ in case[:-2]:
+    #     print('INPUT  :', avl, avl.root.value)
+    #     avl.remove(avl.root.value)
+    #     print('RESULT :', avl)
+    #
+    # print("\nPDF - method remove() example 5")
+    # print("-------------------------------")
+    # for _ in range(100):
+    #     case = list(set(random.randrange(1, 20000) for _ in range(900)))
+    #     avl = AVL(case)
+    #     for value in case[::2]:
+    #         avl.remove(value)
+    #     if not avl.is_valid_avl():
+    #         raise Exception("PROBLEM WITH REMOVE OPERATION")
+    # print('remove() stress test finished')
