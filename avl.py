@@ -173,92 +173,116 @@ class AVL:
             self.root = TreeNode(value)
             return
 
-        height = 0
-        curr_node = self.root
-        has_been_added = False
-        while not has_been_added:                       # look through tree, branching left when
-            if value < curr_node.value:                 # value to be added is smaller than current node.
-                if curr_node.left is None:              # Continue until correct location is found, then
-                    curr_node.left = TreeNode(value)    # add value.
-                    curr_node.left.parent = curr_node
-                    curr_node.left.height = height
-                    has_been_added = True
+        curr_root = self.root
+        added = None
+        while not added:
+            if curr_root.value > value:
+                if curr_root.left == None:
+                    curr_root.left = TreeNode(value)
+                    added = True
                 else:
-                    curr_node = curr_node.left
-            elif value > curr_node.value:              # look through tree, branching right when value
-                if curr_node.right is None:             # to be added is greater than or equal to current
-                    curr_node.right = TreeNode(value)   # node.  Continue until correct location is found,
-                    curr_node.right.height = height     # then add node.
-                    curr_node.right.parent = curr_node
-                    has_been_added = True
+                    curr_root = curr_root.left
+            elif curr_root.value < value:
+                if curr_root.right == None:
+                    curr_root.right = TreeNode(value)
+                    added = True
                 else:
-                    curr_node = curr_node.right
+                    curr_root = curr_root.right
+
+        if self.height(self.root) == -1:
+            if self.height(self.root.left) <= 0:
+                self.rotate1_right(self.root, self.root.left)
+            elif self.height(self.root.left) > 0:
+                self.rotate2_left(self.root.left, self.root.left.right)
+                self.rotate1_right(self.root, self.root.left)
+        elif self.height(self.root) == 1:
+            if self.height(self.root.right) >= 0:
+                self.rotate1_left(self.root, self.root.right)
+            elif self.height(self.root.right) < 0:
+                self.rotate2_right(self.root.right, self.root.right.left)
+                self.rotate1_left(self.root, self.root.right)
+        else:
+            return
+
+    def height(self, node, left_height = 0, right_height = 0):
+        if right_height == 0 and left_height != 0:
+            if node.left != None:
+                left_height += 1
+                node = node.left
+                return self.height(node, left_height, right_height)
+
+            if node.right != None:
+                left_height += 1
+                node = node.right
+                return self.height(node, left_height, right_height)
+
+        elif right_height != 0 and left_height == 0:
+            if node.left != None:
+                right_height += 1
+                node = node.left
+                return self.height(node, left_height, right_height)
+            elif node.right != None:
+                right_height += 1
+                node = node.right
+                return self.height(node, left_height, right_height)
+
+        elif left_height == 0 and right_height == 0:
+            if node.left != None:
+                left_height += 1
+                node = node.left
+                return self.height(node, left_height, right_height)
+
+            if node.right != None:
+                right_height += 1
+                node = node.right
+                return self.height(node, left_height, right_height)
+
+        else:
+            if right_height - left_height > 1:
+                return 1
+            elif right_height - left_height < -1:
+                return -1
             else:
-                return
-        while curr_node.parent != None:
-            curr_node = curr_node.parent
-            height += 1
-        if curr_node.parent == None:
-            curr_node.height = height
-
-        if
-        if self.root.left.height - self.root.right.height > 2:
-            if self.root.left.left.height - self.root.left.right.height > 2:
-                old_root = self.root
-                curr_node = self.root.left
-                old_right_child = curr_node.right
-                self.root = curr_node
-                old_root.parent = self.root
-                old_root.left = old_right_child
-                self.root.right = old_root
-            else:
-                curr_node = self.root.left
-                temp = curr_node.right
-                temp_left = temp.left
-                self.root.left = temp
-                temp.parent = self.root
-                temp.left = curr_node
-                curr_node.parent = temp
-                curr_node.right = temp_left
-                temp_left.parent = curr_node
-
-                curr_node = self.root.left
-                old_right_child = curr_node.right
-                old_root = self.root
-                self.root = curr_node
-                old_root.left = old_right_child
-                old_root.parent = self.root
-                self.root.right = old_root
-
-        elif elf.root.right.height - self.root.left.height > 2:
-            if self.root.right.right.height - self.root.right.left.height > 2:
-                old_root = self.root
-                old_left_child = curr_node.left
-                self.root = curr_node
-                old_root.parent = self.root
-                old_root.right = old_left_child
-                self.root.left = old_root
-
-            else:
-                curr_node = self.root.right
-                temp = curr_node.left
-                temp_right = temp.right
-                self.root.right = temp
-                temp.parent = self.root
-                temp.right = curr_node
-                curr_node.parent = temp
-                curr_node.left = temp_right
-                temp_right.parent = curr_node
-
-                curr_node = self.root.right
-                old_left_child = curr_node.left
-                old_root = self.root
-                self.root = curr_node
-                old_root.right = old_left_child
-                old_root.parent = self.root
-                self.root.left = old_root
+                return 0
 
 
+    def rotate1_left(self, node1, node2):
+        old_left_child = node2.left
+        self.root = node2
+        node2.left = node1
+        node1.parent = node2
+        node1.right = old_left_child
+        if old_left_child != None:
+            old_left_child.parent = node1
+
+    def rotate1_right(self, node1, node2):
+        old_right_child = node2.right
+        self.root = node2
+        node2.right = node1
+        node1.parent = node2
+        node1.left = old_right_child
+        if old_right_child != None:
+            old_right_child.parent = node1
+
+    def rotate2_left(self, node1, node2):
+        old_left_child = node2.left
+        old_parent = node1.parent
+        old_parent.right = node2
+        node2.parent = old_parent
+        node2.right = node1
+        node1.parent = node2
+        if old_left_child != None:
+            node1.left = old_left_child
+
+    def rotate2_right(self, node1, node2):
+        old_right_child = node2.right
+        old_parent = node1.parent
+        old_parent.left = node2
+        node2.parent = old_parent
+        node2.left = node1
+        node1.parent = node2
+        if old_right_child != None:
+            node1.right = old_right_child
 
 
     def remove(self, value: object) -> bool:
