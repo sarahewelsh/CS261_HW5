@@ -173,83 +173,127 @@ class AVL:
             self.root = TreeNode(value)
             return
 
-        curr_root = self.root
+        curr_node = self.root
         added = None
         while not added:
-            if curr_root.value > value:
-                if curr_root.left == None:
-                    curr_root.left = TreeNode(value)
+            if curr_node.value > value:
+                if curr_node.left == None:
+                    curr_node.left = TreeNode(value)
+                    new_node = curr_node.left
+                    new_node.parent = curr_node
+                    child = new_node
+                    parent = new_node.parent
+                    while parent != None:
+                        if child == parent.right:
+                            parent.height += 1
+                        elif child == parent.left:
+                            parent.height -= 1
+                        child = parent
+                        parent = parent.parent
                     added = True
                 else:
-                    curr_root = curr_root.left
-            elif curr_root.value < value:
-                if curr_root.right == None:
-                    curr_root.right = TreeNode(value)
+                    curr_node = curr_node.left
+            elif curr_node.value < value:
+                if curr_node.right == None:
+                    curr_node.right = TreeNode(value)
+                    new_node = curr_node.right
+                    new_node.parent = curr_node
+                    child = new_node
+                    parent = new_node.parent
+                    while parent != None:
+                        if child == parent.right:
+                            parent.height += 1
+                        elif child == parent.left:
+                            parent.height -= 1
+                        child = parent
+                        parent = parent.parent
                     added = True
                 else:
-                    curr_root = curr_root.right
+                    curr_node = curr_node.right
 
-        if self.height(self.root) == -1:
-            if self.height(self.root.left) <= 0:
-                self.rotate1_right(self.root, self.root.left)
-            elif self.height(self.root.left) > 0:
-                self.rotate2_left(self.root.left, self.root.left.right)
-                self.rotate1_right(self.root, self.root.left)
-        elif self.height(self.root) == 1:
-            if self.height(self.root.right) >= 0:
-                self.rotate1_left(self.root, self.root.right)
-            elif self.height(self.root.right) < 0:
-                self.rotate2_right(self.root.right, self.root.right.left)
-                self.rotate1_left(self.root, self.root.right)
-        else:
-            return
-
-    def height(self, node, left_height = 0, right_height = 0):
-        if right_height == 0 and left_height != 0:
-            if node.left != None:
-                left_height += 1
-                node = node.left
-                return self.height(node, left_height, right_height)
-
-            if node.right != None:
-                left_height += 1
-                node = node.right
-                return self.height(node, left_height, right_height)
-
-        elif right_height != 0 and left_height == 0:
-            if node.left != None:
-                right_height += 1
-                node = node.left
-                return self.height(node, left_height, right_height)
-            elif node.right != None:
-                right_height += 1
-                node = node.right
-                return self.height(node, left_height, right_height)
-
-        elif left_height == 0 and right_height == 0:
-            if node.left != None:
-                left_height += 1
-                node = node.left
-                return self.height(node, left_height, right_height)
-
-            if node.right != None:
-                right_height += 1
-                node = node.right
-                return self.height(node, left_height, right_height)
-
-        else:
-            if right_height - left_height > 1:
-                return 1
-            elif right_height - left_height < -1:
-                return -1
+        node = new_node.parent
+        while node != None:
+            if node.height < -1:
+                if node.left.left is not None and node.left.right is not None:
+                    if node.left.height <= 0:
+                        self.rotate1_right(node, node.left)
+                        return
+                    elif node.left.height > 0:
+                        self.rotate2_right(node.left, node.left.right)
+                        self.rotate1_right(node, node.left)
+                        return
+                elif node.left.left is None:
+                    self.rotate2_right(node.left, node.left.right)
+                    self.rotate1_right(node, node.left)
+                    return
+                elif node.left.right is None:
+                    self.rotate1_right(node, node.left)
+                    return
+            elif node.height > 1:
+                if node.right.left is not None and node.right.right is not None:
+                    if node.right.height <= 0:
+                        self.rotate2_left(node.right, node.right.left)
+                        self.rotate1_left(node, node.right)
+                        return
+                    elif node.right.height > 0:
+                        self.rotate1_left(node, node.right)
+                        return
+                elif node.right.left is None:
+                    self.rotate1_left(node, node.right)
+                    return
+                elif node.right.right is None:
+                    self.rotate2_left(node.right, node.right.left)
+                    self.rotate1_left(node, node.right)
+                    return
             else:
-                return 0
+                node = node.parent
+        # node = new_node.parent
+        # while node != None:
+        #     if self.balance_factor(node) < -1:
+        #         if self.balance_factor(node.left) <= 0:
+        #             self.rotate1_right(node, node.left)
+        #         elif self.balance_factor(node) > 1:
+        #             self.rotate2_left(node.left, node.left.right)
+        #             self.rotate1_right(node, node.left)
+        #     elif self.balance_factor(node) > 1:
+        #         if self.balance_factor(node) <= 0:
+        #             self.rotate2_right(node.right, node.right.left)
+        #             self.rotate1_left(node, node.right)
+        #         elif self.balance_factor(node) > 1:
+        #             self.rotate1_left(node, node.right)
+        #     else:
+        #         node = node.parent
 
+
+    # def balance_factor(self, node):
+    #     if node.right is not None and node.left is not None:
+    #         if node.right.height - node.parent.left.height < -1:
+    #             return -1
+    #         elif node.right.height - node.left.height > 1:
+    #             return 1
+    #         else:
+    #             return 0
+    #     elif node.right is None:
+    #         if 0 - node.left.height < -1:
+    #             return -1
+    #         elif 0 - node.left.height > 1:
+    #             return 1
+    #         else:
+    #             return 0
+    #     elif node.left is None:
+    #         if node.right.height < -1:
+    #             return -1
+    #         elif node.right.height > 1:
+    #             return 1
+    #         else:
+    #             return 0
 
     def rotate1_left(self, node1, node2):
         old_left_child = node2.left
         self.root = node2
+        node2.parent = None
         node2.left = node1
+        node1.height
         node1.parent = node2
         node1.right = old_left_child
         if old_left_child != None:
@@ -258,6 +302,7 @@ class AVL:
     def rotate1_right(self, node1, node2):
         old_right_child = node2.right
         self.root = node2
+        node2.parent = None
         node2.right = node1
         node1.parent = node2
         node1.left = old_right_child
